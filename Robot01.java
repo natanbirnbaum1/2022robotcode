@@ -39,8 +39,9 @@ private final MotorControllerGroup leftSpeedGroup = new MotorControllerGroup(lef
 //drivetrain
 DifferentialDrive drivetrain = new DifferentialDrive(leftSpeedGroup, rightSpeedGroup);
 
-//Joystick
-Joystick stick = new Joystick(0);
+//Joysticks
+Joystick stick1 = new Joystick(0);
+Joystick stick2 = new Joystick(1);
 
 
   @Override
@@ -52,6 +53,8 @@ Joystick stick = new Joystick(0);
   @Override
   public void autonomousInit() {}
 
+  drivetrain.arcadeDrive(stick1.getX(), stick1.getY(1));
+  
   @Override
   public void autonomousPeriodic() {}
 
@@ -61,11 +64,8 @@ Joystick stick = new Joystick(0);
   @Override
   public void teleopPeriodic() {
 
-    drivetrain.arcadeDrive(stick.getX(), stick.getY());
+    drivetrain.arcadeDrive(stick1.getX(), stick1.getY());
  
-   // double x = Joystick.getY();
-   // double rotationRate = _joystick.getX();
-   // boolean triggerPressed = _joystick.getTrigger();
     
   }
 
