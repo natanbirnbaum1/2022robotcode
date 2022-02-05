@@ -5,12 +5,18 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+//import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.Joystick;
-//import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj.Relay;
+
+import edu.wpi.first.wpilibj.Timer;
+//import edu.wpi.first.wpilibj.command.InstantCommand;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -26,10 +32,10 @@ public class Robot extends TimedRobot {
 
   //right motors
 private final WPI_VictorSPX rightMotor1 = new WPI_VictorSPX(1);
-private final WPI_VictorSPX rightMotor2 = new WPI_VictorSPX(2);
+private final WPI_VictorSPX rightMotor2 = new WPI_VictorSPX(3);
 
 //left motors
-private final WPI_VictorSPX leftMotor1 = new WPI_VictorSPX(3);
+private final WPI_VictorSPX leftMotor1 = new WPI_VictorSPX(2);
 private final WPI_VictorSPX leftMotor2 = new WPI_VictorSPX(4);
 
 //Speed Controller Groups
@@ -37,12 +43,23 @@ private final MotorControllerGroup rightSpeedGroup = new MotorControllerGroup(ri
 private final MotorControllerGroup leftSpeedGroup = new MotorControllerGroup(leftMotor1, leftMotor2);
 
 //drivetrain
-DifferentialDrive drivetrain = new DifferentialDrive(leftSpeedGroup, rightSpeedGroup);
+DifferentialDrive drivetrain = new DifferentialDrive(rightSpeedGroup, leftSpeedGroup);
 
-//Joysticks
+//Intake Mechanism
+Spark intake = new Spark(1);
+
+//Shooter Mechanism
+Relay shooter = new Relay(0);
+
+//Feeder
+Spark feeder = new Spark(0);
+
+//Joystick
 Joystick stick1 = new Joystick(0);
 Joystick stick2 = new Joystick(1);
 
+//Time
+Timer timer = new Timer();
 
   @Override
   public void robotInit() {}
@@ -51,12 +68,24 @@ Joystick stick2 = new Joystick(1);
   public void robotPeriodic() {}
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
 
-  drivetrain.arcadeDrive(stick1.getX(), stick1.getY(1));
-  
+    timer.reset();
+
+    timer.start();
+  }
+
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+
+   
+  
+    if (timer.get()<2){
+
+      intake.set(1);
+  
+    }
+  }
 
   @Override
   public void teleopInit() {}
@@ -65,8 +94,28 @@ Joystick stick2 = new Joystick(1);
   public void teleopPeriodic() {
 
     drivetrain.arcadeDrive(stick1.getX(), stick1.getY());
- 
     
+    boolean intakeButton = stick2.getRawButton(1);
+    if (!intakeButton){
+			intake.set(0);
+		} else{
+			intake.set(1);
+		}
+
+
+    boolean feederButton = stick2.getRawButton(2);
+    if (!feederButton){
+			feeder.set(0);
+		} else{
+			feeder.set(-1);
+		}
+
+    boolean shooterButton = stick2.getRawButton(6);
+    if (!shooterButton){
+			shooter.set(Value.kOff);
+		} else{
+			shooter.set(Value.kReverse);
+		}
   }
 
   @Override
